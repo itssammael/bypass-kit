@@ -14,7 +14,7 @@ let ltmsWindow;
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 321,
+    width: 350,
     height: 820, // Set the height to the full screen height
     x: 0, // Position at the leftmost side of the screen
     y: 0, // Position at the top of the screen
@@ -24,7 +24,7 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
-
+  mainWindow.setAlwaysOnTop(true, 'screen');
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
@@ -39,9 +39,10 @@ const createWindow = () => {
     height: 820,
     frame: false, // Set to false if you want a frameless window and want to implement a custom title bar
     resizable: false, // Allow resizing if needed
-   x: 321, // Position at the leftmost side of the screen
+   x: 351, // Position at the leftmost side of the screen
     y: 0, // Position at the top of the screen
   });
+  ltmsWindow.setAlwaysOnTop(true, 'screen');
   ltmsWindow.loadURL('https://dlro.com.ph/admin/#/login');
   
   devtoolsWindow = new BrowserWindow({
@@ -160,27 +161,23 @@ ipcMain.on('close-windows-app', (event) => {
     // }
 });
 
-// ipcMain.on('change-button-attribute', (event, newAttributeValue) => {
-//   if (targetWindow) {
-//     // Send a message to the target window's renderer process
-//     // and tell it what to do.
-//     targetWindow.webContents.send('update-remote-button', newAttributeValue);
-//   }
-// });
+
 ipcMain.on('trigger-remote-script', async (event, customScript) => {
     if (ltmsWindow && !ltmsWindow.isDestroyed()) {
         try {
             // This injects and executes JS directly into the remote page's renderer process
             // The script finds the button and changes its textContent attribute
             const script = `${customScript}`;
-            // const script = `$('div.alert').removeClass('alert-danger');$('div.alert').addClass('alert-success');`;
+            // const script = `location.reload();`;
             // Execute the script and optionally wait for a result (if you return one from the IIFE)
             const result = await ltmsWindow.webContents.executeJavaScript(script);
-            console.log("Script Execution Result:", result);
-            event.reply('app-run-result', `Script Execution Result: ${result}`);
+            // console.log("Script Execution Result:", result);
+             event.reply('app-run-result', `Script Execution Result:\n ✅ Script Successfully executed!`);
 
         } catch (error) {
-            console.error("Failed to execute script on remote window:", error);
+            console.error("❌Failed to execute script on remote window:", error);
+             event.reply('app-run-result', `Script Execution Result:\n ❌ Failed to execute script on target`);
+
         }
     }
 });

@@ -2,22 +2,70 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Hello World!</title>
-
+    <link href="/src/index.css" rel="stylesheet">
   </head>
-  <body>
-    <h1 class="text-3xl font-bold underline">LMTS Bypass Tool</h1>
+  <body class="flex flex-col px-3 py-6 h-full bg-gray-600">
+    <div class="flex-grow h-full">
+      <div class="mb-4 text-white text-center">
+        <h1 class="text-3xl font-bold underline uppercase">Bypass Tool</h1>
+      </div>
+      <div class="mb-3 text-white">
+        <h2 class="text-xl font-semibold underline uppercase">Steps:</h2>
+      </div>
+      <div class="mb-3 text-white">
+        <p>
+          <span class="text-md font-regular uppercase">1: </span>Proceed with an Appointment Evaluation, as usual but don't submit.
+        </p>
+      </div>
+      <div class="mb-3 text-white">
+        <p>
+          <span class="text-md font-regular uppercase">2: </span>Click the button below for Appointment type.
+        </p>
+      </div>
+      <div class="flex justify-evenly space-x-3 mb-3">
+        <button class="copyBtn w-1/2 bg-green-400 uppercase p-2 rounded-sm" id="new_resubmit">new</button>
+        <button class="copyBtn w-1/2 bg-amber-400 uppercase p-2 rounded-sm text-gray-200" id="resubmit_as_new">re-evaluation</button>
+      </div>
+      <div class="mb-3 text-white">
+        <p>
+          <span class="text-md font-regular uppercase">3: </span>Click this button to close Medical App.
+        </p>
+      </div>
+      <div class="flex justify-evenly mb-3">
+        <button id="closeBtn" class="bg-red-400 w-3/4 uppercase p-2 rounded-sm">Terminate</button>
+      </div>
+      <div class="mb-3 text-white">
+        <p>
+          <span class="text-md font-regular uppercase">4: </span>Click Submit Appointment on LTMS Screen.
+        </p>
+      </div>
+      <div class="mb-3 text-white">
+        <p>
+          <span class="text-md font-regular uppercase">5: </span>Click this to open Medical App, again.
+        </p>
+      </div>
+      <div class="flex justify-evenly mb-3">
+        <button id="launchBtn" class="bg-cyan-400 w-3/4 uppercase p-2 rounded-sm cursor-pointer">Launch Medical App</button>
+      </div>
+      <div class="mb-3 text-white">
+        <p>
+          <span class="text-md font-regular uppercase">6: </span>Success.
+        </p>
+      </div>
+      <div class=""></div>
+      
+    
+      
+      
 
 
-    <button class="copyBtn" id="new_resubmit">New/Resubmit</button>
-    <button class="copyBtn" id="resubmit_as_new">Resubmit as New</button>
-    <p id="copyStatusConstant"></p>
-
-
-    <button id="launchBtn">Launch Medical App</button>
-    <button id="closeBtn">Terminate Medical App</button>
-    <p id="result"></p>
-
+      
+      
+      <p id="result"></p>
+    </div>
     <script type="module" src="/src/renderer.js"></script>
       <script>
         // Use the API exposed in preload.js
@@ -30,11 +78,8 @@
           
         });
         // Listen for the result coming back from the Main Process
-        window.api.onAppRunResult((message) => {
-            document.getElementById('result').innerText = message;
-        });
-    </script>
-    <script>
+       
+
         // --- CONSTANT DEFINITION ---
         // Define the text as a JavaScript constant outside the click handler
         const NEW_BTN = {
@@ -50,21 +95,13 @@
                 console.log(e.target.id)
                 const newBtn = NEW_BTN[e.target.id]; 
                 const statusElement = document.getElementById('copyStatusConstant');
-                
-                try {
-                    // Use the modern Clipboard API
-                    // await navigator.clipboard.writeText(newBtn);
                     window.api.triggerRemoteUpdate(newBtn);
-                    statusElement.innerText = '✅ Button Successfully hacked! Press Terminate Medical App.';
-                } catch (err) {
-                    console.error('Failed to copy text: ', err);
-                    statusElement.innerText = '❌ Failed to copy text.';
-                }
             });
         });
 
-        // Note: Make sure you use a unique ID for the button (e.g., 'copyBtnConstant') 
-        // if you kept the old button ID from previous examples.
+         window.api.onAppRunResult((message) => {
+            document.getElementById('result').innerText = message;
+        });
     </script>
   </body>
 </html>

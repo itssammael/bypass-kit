@@ -4,7 +4,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
     runWindowsApp: (appPath) => ipcRenderer.send('run-windows-app', appPath),
-    closeWindowsApp: () => ipcRenderer.send('close-windows-app'),
+    closeWindowsApp: () => ipcRenderer.send('close-windows-app'),   
+    triggerRemoteUpdate: (script) => ipcRenderer.send('trigger-remote-script', script),
     onAppRunResult: (callback) => ipcRenderer.on('app-run-result', (event, message) => callback(message)),
-    triggerRemoteUpdate: (script) => ipcRenderer.send('trigger-remote-script', script)
 });

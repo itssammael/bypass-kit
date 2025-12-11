@@ -2,7 +2,7 @@
   "name": "bypass-kit",
   "productName": "bypass-kit",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "LTMS Medical Examition Medical App Biometric(Dermalog) Bypass. Limited Edition.",
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "electron-forge start",
@@ -13,8 +13,8 @@
   },
   "keywords": [],
   "author": {
-    "name": "Alamein Tabunda",
-    "email": "bayawanitssoftware@gmail.com"
+    "name": "Hades",
+    "email": "godoftheunderworld@cerberus.com"
   },
   "license": "MIT",
   "devDependencies": {
@@ -26,6 +26,7 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.10.2",
     "@electron-forge/plugin-fuses": "^7.10.2",
     "@electron-forge/plugin-vite": "^7.10.2",
+    "@electron-forge/publisher-github": "^7.10.2",
     "@electron/fuses": "^1.8.0",
     "autoprefixer": "^10.4.22",
     "electron": "39.2.6",
@@ -35,6 +36,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
+    "electron-context-menu": "^4.1.1",
     "electron-squirrel-startup": "^1.0.1"
   }
 }

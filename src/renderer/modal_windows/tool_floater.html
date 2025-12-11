@@ -98,10 +98,10 @@
         document.getElementById('reloadBtn').addEventListener('click', () => {
           window.api.triggerReload('resubmit_as_new');
         })
-        // window.addEventListener('focus', () => {
-        //     window.api.notifyFocus();
-        // });
-
+        window.addEventListener('focus', () => {
+            window.electronAPI.notifyFocus();
+        });
+        
         window.api.onAppRunResult((message) => {
             document.getElementById('result').innerText = message;
         });

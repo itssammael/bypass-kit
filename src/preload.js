@@ -6,5 +6,7 @@ contextBridge.exposeInMainWorld('api', {
     runWindowsApp: (appPath) => ipcRenderer.send('run-windows-app', appPath),
     closeWindowsApp: () => ipcRenderer.send('close-windows-app'),   
     triggerRemoteUpdate: (script) => ipcRenderer.send('trigger-remote-script', script),
+    triggerReload: () => ipcRenderer.send('trigger-reload-script'),
+    notifyFocus: () => ipcRenderer.send('window-focused'),
     onAppRunResult: (callback) => ipcRenderer.on('app-run-result', (event, message) => callback(message)),
 });

@@ -4,12 +4,17 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: './resources/icons/icon',
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        options: {
+          icon: './resources/icons/icon.ico',
+        },
+      },
     },
     {
       name: '@electron-forge/maker-zip',
@@ -63,4 +68,17 @@ module.exports = {
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
     }),
   ],
+  // publishers: [
+  //   {
+  //     name: '@electron-forge/publisher-github',
+  //     config: {
+  //       repository: {
+  //         owner: 'itssammael', 
+  //         name: 'bypass-kit'        
+  //       },
+  //       // Optionally, set to true to create a draft release first
+  //       draft: true 
+  //     }
+  //   }
+  // ],
 };

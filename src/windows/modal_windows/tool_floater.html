@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>loader Bypass Tool</title>
+    <link href="/src/index.css" rel="stylesheet">
+  </head>
+  <body class="flex px-3 py-2 h-full justify-center items-center ">
+    
+    <div class="bg-purple-400/[0.35] rounded-md">
+      <!-- <div class="mb-4 text-white text-center">
+        <h1 class="text-2xl font-bold uppercase">LTMS Tool</h1>
+      </div> -->
+      <img src="/resources/imgs/loader.png" alt="">
+      
+      <div class="flex justify-evenly">
+        <button id="launchBtn" class="bg-red-400 text-white w-3/4 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer">open</button>
+      </div> 
+    
+    </div>
+    <script type="module" src="/src/settings-renderer.js"></script>
+      <script>
+       
+       
+
+        document.getElementById('launchBtn').addEventListener('click', () => {
+          // window.api.notifyFocus();
+          window.api.setStartWindowPosition()
+        })
+       
+        
+    </script>
+  </body>
+</html>

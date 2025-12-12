@@ -53,6 +53,10 @@ module.exports = {
             name: 'main_window',
             config: 'vite.renderer.config.mjs',
           },
+          {
+            name: 'settings_window', // A unique name for the new window
+            config: 'vite.settings.config.mjs', // The new config file created above
+          },
         ],
       },
     },

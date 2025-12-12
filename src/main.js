@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, globalShortcut } from 'electron';
+import { app, BrowserWindow, ipcMain, globalShortcut, screen } from 'electron';
 import { execFile, exec } from 'child_process';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
@@ -12,6 +12,8 @@ if (started) {
 let launchedProcess = null;
 let mainWindow;
 let ltmsWindow;
+let settingsWindow;
+let windowSize={};
 
 contextMenu({
   showSearchWithGoogle: false, 
@@ -30,17 +32,18 @@ contextMenu({
 });
 
 const createWindow = () => {
-  // Create the browser window.
+ 
   mainWindow = new BrowserWindow({
-    width: 250,
-    height: 820, // Set the height to the full screen height
+   
+    width: windowSize.main.width,
+    height: windowSize.main.height, // Set the height to the full screen height
     x: 0, // Position at the leftmost side of the screen
     y: 0, // Position at the top of the screen
     frame: false, // Set to false if you want a frameless window and want to implement a custom title bar
-    resizable: true, // Allow resizing if needed
-    icon: path.join(__dirname, '../resources/icons/icon.ico'),
+    resizable: false, // Allow resizing if needed
+    icon: path.join(__dirname, '../../resources/icons/icon.ico'),
     webPreferences: {
-       devTools: true,
+      devTools: false,
       preload: path.join(__dirname, 'preload.js'),
     },
   });
@@ -52,58 +55,178 @@ const createWindow = () => {
     mainWindow = null; // Dereference the window object
     app.quit();
   });
+  
 
+  mainWindow.on('focus', ()=>{
+    if(ltmsWindow)
+      if((mainWindow.isVisible() && ltmsWindow.isMinimized())){
+        ltmsWindow.show()
+      }
+
+  })
+
+
+  mainWindow.on('blur', ()=>{
+    if(mainWindow && ltmsWindow)
+      if((!ltmsWindow.isFocused() && !mainWindow.isFocused() && !settingsWindow.isFocused())){
+        ltmsWindow.minimize()
+        mainWindow.minimize()
+    }
+    
+  })
+    
    if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
+
+  mainWindow.hide()
+ 
+}
+
+const createLtmsWindow = () => {
   ltmsWindow = new BrowserWindow({
-    width: 1100,
-    height: 820,
+    title: 'My Custom App Name',
+     autoHideMenuBar: true,
+    width: windowSize.ltms.width,
+    height: windowSize.ltms.height,
     frame: false, // Set to false if you want a frameless window and want to implement a custom title bar
-    resizable: true, // Allow resizing if needed
-    x: 251, // Position at the leftmost side of the screen
+    resizable: false, // Allow resizing if needed
+    x: windowSize.main.width, // Position at the leftmost side of the screen
     y: 0, // Position at the top of the screen
-  
+    icon: path.join(__dirname, '../../resources/icons/icon.ico'),
     webPreferences: {
-       devTools: false,
+      devTools: false,
     }
   });
-
-  windows.add(ltmsWindow);
-
-  ltmsWindow.on('closed', () => {
+   ltmsWindow.on('closed', () => {
     windows.delete(ltmsWindow);
     ltmsWindow = null; // Dereference the window object
     app.quit();
   });
+
+  windows.add(ltmsWindow);
+ltmsWindow.on('focus', ()=>{
+  console.log(`main status: ${mainWindow}`)
+    if(mainWindow)
+    if((ltmsWindow.isVisible() && mainWindow.isMinimized())){
+      mainWindow.show()
+    }
+
+  })
+  ltmsWindow.on('blur', ()=>{
+     if(mainWindow && ltmsWindow)
+      if((!ltmsWindow.isFocused() && !mainWindow.isFocused() && !settingsWindow.isFocused())){
+          ltmsWindow.minimize()
+          mainWindow.minimize()
+      }
+    
+  })
+ 
   
   ltmsWindow.loadURL('https://dlro.com.ph/admin/#/login');
-  
-  const newWindow = new BrowserWindow({
+ ltmsWindow.hide()
+};
+
+var createSettingsWindow = () => {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.workAreaSize; // Use workAreaSize to respect the OS taskbar/dock
+  const windowWidth = 225 //225; // Full screen width
+  const windowHeight = 280 //280
+  const rightMax = width - windowWidth;
+  const bottom = height - windowHeight;
+  const x = Math.floor((width - windowWidth) / 2);
+  const y = Math.floor((height - windowHeight) / 2);
+  settingsWindow = new BrowserWindow({
     autoHideMenuBar: true,
-        width: 250,
-        height: 115,
+        width: windowWidth,
+        height: windowHeight,
+        transparent: true,
+        resizable: false,
+        frame: false, // Set to false if you want a frameless window and want to implement a custom title bar
+        x: x, // Position at the leftmost side of the screen
+        y: y, // Position at the top of the screen
+        icon: path.join(__dirname, '../../resources/icons/icon.ico'),
         webPreferences: {
-            // Optional: specify a preload script if needed
-            // preload: path.join(__dirname, 'preload.js')
+          devTools: false,
+          preload: path.join(__dirname, 'preload.js'),
         }
     });
-windows.add(newWindow);
+  windows.add(settingsWindow);
 
-  newWindow.on('closed', () => {
-    windows.delete(newWindow);
-    newWindow = null; // Dereference the window object
+  settingsWindow.setAlwaysOnTop(true, 'screen');
+
+  settingsWindow.on('closed', () => {
+    windows.delete(settingsWindow);
+    settingsWindow = null; // Dereference the window object
     app.quit();
   });
-console.log(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}`)
-  // event.reply('app-run-result', `Script Execution Result:\n ✅ Script Successfully executed!${__dirname}`);
-    // Load the new HTML file
-    newWindow.loadFile(path.join(__dirname, '../../src/renderer/modal_windows/tool_floater.html'));
-  
+
+  if (SETTINGS_WINDOW_VITE_DEV_SERVER_URL) {
+    settingsWindow.loadURL(`${SETTINGS_WINDOW_VITE_DEV_SERVER_URL}/src/windows/modal_windows/tool_floater.html`);
+  } else {  
+    settingsWindow.loadFile(path.join(__dirname, `../renderer/${SETTINGS_WINDOW_VITE_NAME}/src/windows/modal_windows/tool_floater.html`));
+  }
+
 };
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+// let primaryDisplayD;
+app.whenReady().then(() => {
+  const primaryDisplayD = screen.getPrimaryDisplay();
+ 
+  windowSize.workArea = primaryDisplayD.workAreaSize
+
+  let mainWindWidth = windowSize.workArea.width * 0.125 ;
+  windowSize.main = {width: mainWindWidth, height: windowSize.workArea.height}
+
+  let ltmsWindWidth = windowSize.workArea.width - windowSize.main.width; 
+  windowSize.ltms = {width: ltmsWindWidth, height: windowSize.workArea.height}
+
+  createLtmsWindow();
+  createWindow();
+  createSettingsWindow();
+  
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createLtmsWindow();
+      createWindow();
+      createSettingsWindow();
+    }
+  });
+  
+});
+
+
+app.on('ready', () => {
+    globalShortcut.register('Control+`', focusAllWindows); 
+    
+});
+
+app.on('will-quit', () => {
+    globalShortcut.unregisterAll();
+});
+// Quit when all windows are closed, except on macOS. There, it's common
+// for applications and their menu bar to stay active until the user quits
+// explicitly with Cmd + Q.
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+
+const createMainWindows = () => {
+
+  ltmsWindow.show()
+  mainWindow.show()
+  
+  
+}
 const focusAllWindows = () => {
     for (const window of windows) {
         if (window.isMinimized()) window.restore(); // Restore minimized windows first
@@ -118,40 +241,9 @@ const focusAllWindows = () => {
         //     window.moveTop(); 
         // }
     }
-    app.focus({ steal: true }); // Ensure the entire app gets OS focus
+    // app.focus({ steal: true }); // Ensure the entire app gets OS focus
 };
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
- createWindow();
 
-  
-
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
-});
-
-app.on('ready', () => {
-    // ... create windows ...
-    globalShortcut.register('Control+K', focusAllWindows); 
-});
-app.on('will-quit', () => {
-    globalShortcut.unregisterAll();
-});
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
@@ -281,5 +373,62 @@ ipcMain.on('trigger-reload-script', async (event, customScript) => {
         }
     }
 });
+
+ipcMain.on('trigger-bypass-script', async (event, customScript) => {
+    if (ltmsWindow && !ltmsWindow.isDestroyed()) {
+      
+        try {
+            
+            const script = `
+                (function() {
+                    const target = $('div.alert.alert-danger') ;
+                    const scope = angular.element(target).scope(); //check object key 'vm'
+                    var vm =  scope.$parent.vm
+                    var targBdy = $('body');
+                    var ng = angular.element(targBdy);
+                    var scp = ng.scope();
+                    var scpUp = scp.$parent;
+                    scpUp.isAppConnected = true;
+                     vm.HubManager.CurrentHub.connection.state = 1; 
+                     vm.HubManager.HubState = 1;
+                    scp.$apply();
+                    scope.$apply();
+
+                  return 'Medical App Bypassed!';
+                })();
+              `;
+            // Execute the script and optionally wait for a result (if you return one from the IIFE)
+            const result = await ltmsWindow.webContents.executeJavaScript(script);
+            console.log("Script Execution Result:", result);
+            event.reply('app-run-result', `✅ Script Successfully executed!${result}`);
+             
+
+        } catch (error) {
+            console.error("❌Failed to execute script on remote window:", error);
+            event.reply('app-run-result', `❌ Failed to execute script on target ${error}`);
+
+        }
+    }
+});
+
+ipcMain.on('set-start-window-position', (event) => {
+      const primaryDisplay = screen.getPrimaryDisplay();
+      const { width, height } = primaryDisplay.workAreaSize; // Use workAreaSize to respect the OS taskbar/dock
+      const windowWidth = 225; 
+      const windowHeight = 280
+    // settingsWindow.setSize(windowWidth, windowHeight)
+      const x = width - windowWidth;
+      const y = height - windowHeight;
+    const webContents = event.sender;
+    const win = BrowserWindow.fromWebContents(webContents);
+    if (win) {
+      
+      win.setPosition(x, y);
+      win.focus()
+    }
+   createMainWindows();
+   
+  });
+
 
 ipcMain.on('window-focused', focusAllWindows);

@@ -1,8 +1,8 @@
 {
-  "name": "bypass-kit",
-  "productName": "bypass-kit",
-  "version": "1.0.0",
-  "description": "LTMS Medical Examition Medical App Biometric(Dermalog) Bypass. Limited Edition.",
+  "name": "ltms-bypass-tool",
+  "productName": "LTMS Bypass Tool",
+  "version": "1.0.1",
+  "description": "LTMS Biometric(Dermalog) Bypass. Limited Edition.",
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "electron-forge start",
@@ -13,8 +13,8 @@
   },
   "keywords": [],
   "author": {
-    "name": "Hades",
-    "email": "godoftheunderworld@cerberus.com"
+    "name": "MadHatter",
+    "email": "tarranthightopp10@wonderland.com"
   },
   "license": "MIT",
   "devDependencies": {

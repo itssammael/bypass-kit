@@ -5,6 +5,7 @@ module.exports = {
   packagerConfig: {
     asar: true,
     icon: './resources/icons/icon',
+    executableName: "ltms-bypass-tool",
   },
   rebuildConfig: {},
   makers: [
@@ -22,7 +23,11 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {},
+      config: {
+        options: {
+          icon: './resources/icons/icon.ico',
+        },
+      },
     },
     {
       name: '@electron-forge/maker-rpm',

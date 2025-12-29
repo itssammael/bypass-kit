@@ -13,11 +13,35 @@
         <h1 class="text-3xl font-bold underline uppercase">LTMS Tool</h1>
       </div>
       <div class="mb-3 text-white">
-        <h2 class="text-xl font-semibold underline uppercase">Steps:</h2>
+        <p class="text-left">
+          <span class="text-md font-bold uppercase underline">Account</span>
+        </p>
+        <p>
+          <span class="text-xs font-bold uppercase">email: </span> <span class="text-sm ml-3">brionesmedical@gmail.com</span>
+        </p>
+        <p>
+          <span class="text-xs font-bold uppercase">password: </span><span class="text-sm ml-3">y7#Qz#Z6</span>
+        </p>
+      </div>
+      <hr>
+      <div class="mb-3 text-white">
+        <p>
+          <span class="text-md font-semibold uppercase underline">BYPASS MEDICAL APP</span> 
+        </p>
+      </div>
+      <div class="flex justify-evenly mb-3">
+        <button id="bypassBtn" class="bg-indigo-400 w-3/4 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer">Show Login</button>
+      </div>
+       <div class="flex justify-evenly mb-3">
+        <button id="reloadBtn" class="bg-blue-400 w-3/4 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer">Reload LTMS</button>
+      </div>
+      <hr>
+      <div class="mb-3 text-white">
+        <h2 class="text-md font-semibold underline uppercase">Steps:</h2>
       </div>
       <div class="mb-3 text-white">
         <p>
-          <span class="text-md font-regular uppercase">1: </span>Proceed with an Appointment Evaluation, as usual but don't submit.
+          <span class="text-md font-regular uppercase">1: </span>Proceed with an Client Evaluation but don't submit.
         </p>
       </div>
       <div class="mb-3 text-white">
@@ -62,38 +86,43 @@
         </p>
       </div>
       
+      <hr>
+      <div class="mb-3 text-white">
+        <p class="text-left">
+          <span class="text-md font-semibold underline uppercase">FOR NO APPEARANCE </span> 
+        </p>
+      </div>
+      <div class="flex justify-evenly mb-3">
+        <button id="toggleBtn" class="bg-indigo-400 w-3/4 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer">Show Upload BTN</button>
+      </div>
+      <div id="na-tools" class="hidden">
       
-      <div class="flex justify-evenly mb-3">
-        <button id="reloadBtn" class="bg-indigo-400 w-3/4 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer">Reload LTMS</button>
+      <div class="flex flex-col justify-evenly mb-3">
+        <span id="file-name" class="text-gray-400 italic text-sm">No file chosen</span>
+
+       <input type="file" id="file-upload" accept="image/jpeg" name="file-upload" class="hidden">
+        <label for="file-upload" class="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 uppercase text-center">
+          Upload File
+        </label>
+        
       </div> 
-      <div class="mb-3 text-white">
-        <p class="text-center">
-          <span class="text-md font-bold uppercase">LTMS Account</span>
-        </p>
-        <p>
-          <span class="text-xs font-bold uppercase">email: </span> <span class="text-sm ml-3">brionesmedical@gmail.com</span>
-        </p>
-        <p>
-          <span class="text-xs font-bold uppercase">password: </span><span class="text-sm ml-3">y7#Qz#Z6</span>
-        </p>
-      </div>
-      <div class="mb-3 text-white">
-        <p>
-          <span class="text-md font-regular uppercase">BYPASS MEDICAL APP</span> 
-        </p>
-      </div>
-      <div class="flex justify-evenly mb-3">
-        <button id="bypassBtn" class="bg-indigo-400 w-3/4 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer">Show Login</button>
       </div>
       <p id="result"></p>
     </div>
     <script type="module" src="/src/renderer.js"></script>
       <script>
-       
+        let isUploadToggled = false;
         const NEW_BTN ={
           new_resubmit : 'button.btn.btn-secondary',
           resubmit_as_new: 'button.btn.btn-warning'
         }
+        document.getElementById('toggleBtn').addEventListener('click', (e) => {
+          isUploadToggled = !isUploadToggled;
+          e.target.innerText = isUploadToggled ? "Hide Upload BTN" : "Show Upload BTN";
+          var container = document.getElementById('na-tools');
+          isUploadToggled ? container.classList.remove('hidden') : container.classList.add('hidden');
+
+        });
         
         document.getElementById('new_resubmit').addEventListener('click', () => {
           window.api.triggerRemoteUpdate('new_resubmit');
@@ -109,9 +138,63 @@
         document.getElementById('reloadBtn').addEventListener('click', () => {
           window.api.triggerReload();
         })
-        // window.addEventListener('focus', () => {
-        //     window.api.notifyFocus();
-        // });
+        
+        const convertBase64 = (file) => {
+          return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            // Use readAsDataURL to encode the file data as a Base64 data URL
+            fileReader.readAsDataURL(file);
+
+            fileReader.onload = () => {
+              resolve(fileReader.result); // The result is a data URL (e.g., data:image/png;base64,...)
+            };
+
+            fileReader.onerror = (error) => {
+              reject(error);
+            };
+          });
+        };
+        const convertFileToBase64 = async (fileInput) => {
+      
+          const file = fileInput;
+          var result = {
+            base64 : '',
+            message: '',
+            success: false,
+          };
+
+          if (file) {
+            try {
+              const base64String = await convertBase64(file);
+              const base64Data = base64String.split(',')[1];
+              
+            //  base64Output.value = base64Data; // full Data URL
+              
+              result.base64 = base64Data; // just the Base64 string
+              result.message = "Image Converted to Base64";
+              result.success = true;
+
+            } catch (error) {
+              console.error("Error converting file to Base64:", error);
+                result.message = "Error converting file.";
+            }
+              return result;
+          } else {
+              result.message = "Please select a file.";
+              return result;
+          }
+          
+        };
+        
+        document.getElementById('file-upload').addEventListener('change', (e) => {
+          var selectedFile = e.target.files[0]
+          var filename_str = document.getElementById('file-name');
+          filename_str.textContent = selectedFile.name;
+
+            convertFileToBase64(selectedFile).then((ev)=>{
+              window.api.triggerOverrideImgScript(JSON.stringify(ev))
+            });
+        });
 
         window.api.onAppRunResult((message) => {
             document.getElementById('result').innerText = message;

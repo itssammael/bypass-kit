@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('api', {
     triggerRemoteUpdate: (script) => ipcRenderer.send('trigger-remote-script', script),
     triggerReload: () => ipcRenderer.send('trigger-reload-script'),
     triggerBypassScript: () => ipcRenderer.send('trigger-bypass-script'),
+    triggerOverrideImgScript: (data) => ipcRenderer.send('trigger-override-img-script', data),
     notifyFocus: () => ipcRenderer.send('window-focused'),
     setStartWindowPosition: () => ipcRenderer.send('set-start-window-position'),
     onAppRunResult: (callback) => ipcRenderer.on('app-run-result', (event, message) => callback(message)),

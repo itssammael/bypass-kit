@@ -40,10 +40,10 @@ const createWindow = () => {
     x: 0, // Position at the leftmost side of the screen
     y: 0, // Position at the top of the screen
     frame: false, // Set to false if you want a frameless window and want to implement a custom title bar
-    resizable: false, // Allow resizing if needed
+    resizable: true, // Allow resizing if needed
     icon: path.join(__dirname, '../../resources/icons/icon.ico'),
     webPreferences: {
-      devTools: false,
+      devTools: true,
       preload: path.join(__dirname, 'preload.js'),
     },
   });
@@ -80,10 +80,7 @@ const createWindow = () => {
   } else {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
-
-
   mainWindow.hide()
- 
 }
 
 const createLtmsWindow = () => {
@@ -93,12 +90,12 @@ const createLtmsWindow = () => {
     width: windowSize.ltms.width,
     height: windowSize.ltms.height,
     frame: false, // Set to false if you want a frameless window and want to implement a custom title bar
-    resizable: false, // Allow resizing if needed
+    resizable: true, // Allow resizing if needed
     x: windowSize.main.width, // Position at the leftmost side of the screen
     y: 0, // Position at the top of the screen
     icon: path.join(__dirname, '../../resources/icons/icon.ico'),
     webPreferences: {
-      devTools: false,
+      devTools: true,
     }
   });
    ltmsWindow.on('closed', () => {
@@ -127,7 +124,7 @@ ltmsWindow.on('focus', ()=>{
  
   
   ltmsWindow.loadURL('https://dlro.com.ph/admin/#/login');
- ltmsWindow.hide()
+  ltmsWindow.hide()
 };
 
 var createSettingsWindow = () => {
@@ -144,7 +141,7 @@ var createSettingsWindow = () => {
         width: windowWidth,
         height: windowHeight,
         transparent: true,
-        resizable: false,
+        resizable: true,
         frame: false, // Set to false if you want a frameless window and want to implement a custom title bar
         x: x, // Position at the leftmost side of the screen
         y: y, // Position at the top of the screen
@@ -156,7 +153,7 @@ var createSettingsWindow = () => {
     });
   windows.add(settingsWindow);
 
-  settingsWindow.setAlwaysOnTop(true, 'screen');
+  settingsWindow.setAlwaysOnTop(false, 'screen');
 
   settingsWindow.on('closed', () => {
     windows.delete(settingsWindow);
@@ -221,11 +218,8 @@ app.on('window-all-closed', () => {
 
 
 const createMainWindows = () => {
-
   ltmsWindow.show()
   mainWindow.show()
-  
-  
 }
 const focusAllWindows = () => {
     for (const window of windows) {
@@ -244,11 +238,6 @@ const focusAllWindows = () => {
     // app.focus({ steal: true }); // Ensure the entire app gets OS focus
 };
 
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-
-// Handle the request from the Renderer Process
 ipcMain.on('run-windows-app', (event, appPath) => {
     const executablePath = 'C:\\Users\\user\\AppData\\Local\\Apps\\2.0\\MTV4XM0V.E5X\\N7ZVC8YD.1YV\\medi..tion_0000000000000000_07e4.000b_527094018bfeb39c\\Medical.exe'; 
 
@@ -402,6 +391,55 @@ ipcMain.on('trigger-bypass-script', async (event, customScript) => {
             console.log("Script Execution Result:", result);
             event.reply('app-run-result', `✅ Script Successfully executed!${result}`);
              
+
+        } catch (error) {
+            console.error("❌Failed to execute script on remote window:", error);
+            event.reply('app-run-result', `❌ Failed to execute script on target ${error}`);
+
+        }
+    }
+});
+
+ipcMain.on('trigger-override-img-script', async (event, strdata) => {
+
+    if (ltmsWindow && !ltmsWindow.isDestroyed()) {
+       
+        try {
+             var data = JSON.parse(strdata);
+            const script = `
+                (function() {
+                    const target = $('div.alert.alert-danger') ;
+                    const scope = angular.element(target).scope(); //check object key 'vm'
+                    var vm =  scope.$parent.vm;
+
+
+                    var photoB64 ='${data.base64}'; //image Base64 value
+                  
+                      vm.Submission.ApplicantPhoto = 'data:image/jpeg;base64,'+photoB64;
+                      var applicantMtdt = JSON.parse(vm.Submission.ApplicantPhotoMetadata);
+                      applicantMtdt.ReferenceImage.Bytes = photoB64;
+                      vm.Submission.ApplicantPhotoMetadata = JSON.stringify(applicantMtdt);
+
+                      vm.Submission.DoctorPhoto = 'data:image/jpeg;base64,'+photoB64;
+                      var DoctorMtdt = JSON.parse(vm.Submission.DoctorPhotoMetadata);
+                      DoctorMtdt.ReferenceImage.Bytes = photoB64;
+                      vm.Submission.DoctorPhotoMetadata = JSON.stringify(DoctorMtdt);
+
+                      scope.$apply();
+
+
+
+                      return '${data.message} and Applicant Image Inserted';
+                     
+                })();
+              `;
+            // Execute the script and optionally wait for a result (if you return one from the IIFE)
+            const result = await ltmsWindow.webContents.executeJavaScript(script);
+            console.log("Script Execution Result:", result);
+
+            event.reply('app-run-result', `✅ Script Successfully executed!${result}`);
+              // console.log(JSON.stringify(data));
+              // event.reply('app-run-result', `✅ Script Successfully executed!${data.message}`);
 
         } catch (error) {
             console.error("❌Failed to execute script on remote window:", error);

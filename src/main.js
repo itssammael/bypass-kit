@@ -9,15 +9,23 @@ import started from 'electron-squirrel-startup';
 import contextMenu from 'electron-context-menu';
 const windows = new Set();
 
+
+
+
 if (started) {
   app.quit();
 }
-config();
+
+
 let launchedProcess = null;
 let mainWindow;
 let ltmsWindow;
 let settingsWindow;
 let windowSize={};
+
+const envPath = app.isPackaged ? path.join(process.resourcesPath, '.env') : path.resolve(process.cwd(), '.env');
+
+config({path: envPath});
 
 contextMenu({
   showSearchWithGoogle: false, 

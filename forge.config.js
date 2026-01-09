@@ -6,6 +6,9 @@ module.exports = {
     asar: true,
     icon: './resources/icons/icon',
     executableName: "ltms-bypass-tool",
+    extraResource: [
+      ".env"
+    ],
   },
   rebuildConfig: {},
   makers: [

@@ -1,3 +1,7 @@
+// import 'dotenv/config';
+// import dotenv from 'dotenv';
+import {config} from 'dotenv';
+
 import { app, BrowserWindow, ipcMain, globalShortcut, screen } from 'electron';
 import { execFile, exec } from 'child_process';
 import path from 'node:path';
@@ -8,7 +12,7 @@ const windows = new Set();
 if (started) {
   app.quit();
 }
-
+config();
 let launchedProcess = null;
 let mainWindow;
 let ltmsWindow;
@@ -49,7 +53,7 @@ const createWindow = () => {
   });
 
   windows.add(mainWindow);
-  
+
   mainWindow.on('closed', () => {
     windows.delete(ltmsWindow);
     mainWindow = null; // Dereference the window object
@@ -85,7 +89,7 @@ const createWindow = () => {
 
 const createLtmsWindow = () => {
   ltmsWindow = new BrowserWindow({
-    title: 'My Custom App Name',
+    title: 'LTMS App Window',
      autoHideMenuBar: true,
     width: windowSize.ltms.width,
     height: windowSize.ltms.height,
@@ -106,7 +110,7 @@ const createLtmsWindow = () => {
 
   windows.add(ltmsWindow);
 ltmsWindow.on('focus', ()=>{
-  console.log(`main status: ${mainWindow}`)
+ 
     if(mainWindow)
     if((ltmsWindow.isVisible() && mainWindow.isMinimized())){
       mainWindow.show()
@@ -178,7 +182,7 @@ app.whenReady().then(() => {
  
   windowSize.workArea = primaryDisplayD.workAreaSize
 
-  let mainWindWidth = windowSize.workArea.width * 0.125 ;
+  let mainWindWidth = windowSize.workArea.width * 0.2 ;
   windowSize.main = {width: mainWindWidth, height: windowSize.workArea.height}
 
   let ltmsWindWidth = windowSize.workArea.width - windowSize.main.width; 
@@ -342,9 +346,11 @@ ipcMain.on('trigger-reload-script', async (event, customScript) => {
     if (ltmsWindow && !ltmsWindow.isDestroyed()) {
       
         try {
-            
+            const not_connected = `"not-connected"`
             const script = `
                 (function() {
+                  // const els = $('li[class=${not_connected}]')
+                 // alert(${not_connected})
                   location.reload();
                   return 'Target reloaded';
                 })();
@@ -466,7 +472,18 @@ ipcMain.on('set-start-window-position', (event) => {
     }
    createMainWindows();
    
-  });
+});
 
+ipcMain.on('validate-master-key', (event, userkey) => {
+      const ukey = userkey;
+      const MASTER_KEYS = JSON.parse(process.env.MASTER_KEYS)
+      const KEY_CHAIN = MASTER_KEYS.KEY_CHAIN
+      const validated = KEY_CHAIN.find(item => item.CHAIN.U_KEY === ukey);
+      if(validated)
+        event.reply('show-upload-button', validated)
+     
+  
+   
+});
 
 ipcMain.on('window-focused', focusAllWindows);

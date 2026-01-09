@@ -4,23 +4,23 @@
     <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Bypass Tool</title>
+    <title>Support Tool</title>
     <link href="/src/index.css" rel="stylesheet">
   </head>
   <body class="flex flex-col px-3 py-6 h-full bg-gray-600">
     <div class="flex-grow h-full">
       <div class="mb-4 text-white text-center">
-        <h1 class="text-3xl font-bold underline uppercase">LTMS Tool</h1>
+        <h1 class="text-3xl font-bold underline uppercase">Support Tool</h1>
       </div>
       <div class="mb-3 text-white">
         <p class="text-left">
           <span class="text-md font-bold uppercase underline">Account</span>
         </p>
         <p>
-          <span class="text-xs font-bold uppercase">email: </span> <span class="text-sm ml-3">brionesmedical@gmail.com</span>
+          <span class="text-xs font-bold uppercase">email: </span> <span id="u-email" class="text-sm ml-3">brionesmedical@gmail.com</span> <span id="copy-email" class="copy-icon text-lg cursor-pointer" title="Copy Email">📋</span>
         </p>
         <p>
-          <span class="text-xs font-bold uppercase">password: </span><span class="text-sm ml-3">y7#Qz#Z6</span>
+          <span class="text-xs font-bold uppercase">password: </span><span id="u-pw" class="text-sm ml-3">y7#Qz#Z6</span> <span id="copy-pw" class="copy-icon text-lg cursor-pointer" title="Copy Password">📋</span>
         </p>
       </div>
       <hr>
@@ -30,7 +30,7 @@
         </p>
       </div>
       <div class="flex justify-evenly mb-3">
-        <button id="bypassBtn" class="bg-indigo-400 w-3/4 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer">Show Login</button>
+        <button id="bypassBtn" class="bg-indigo-400 w-3/4 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer">Run Bypass</button>
       </div>
        <div class="flex justify-evenly mb-3">
         <button id="reloadBtn" class="bg-blue-400 w-3/4 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer">Reload LTMS</button>
@@ -53,32 +53,7 @@
         <button class="copyBtn w-1/2 bg-green-400 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer" id="new_resubmit">new</button>
         <button class="copyBtn w-1/2 bg-amber-400 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer text-gray-100" id="resubmit_as_new">re-evaluate</button>
       </div>
-      <!-- <div class="mb-3 text-white">
-        <p>
-          <span class="text-md font-regular uppercase">3: </span>Click this button to close Medical App.
-        </p>
-      </div> -->
-      <!-- <div class="flex justify-evenly mb-3">
-        <button id="closeBtn" class="bg-red-400 w-3/4 uppercase p-2 rounded-sm">Terminate</button>
-      </div>
-      <div class="mb-3 text-white">
-        <p>
-          <span class="text-md font-regular uppercase">4: </span>Click Submit Appointment on LTMS Screen.
-        </p>
-      </div>
-      <div class="mb-3 text-white">
-        <p>
-          <span class="text-md font-regular uppercase">5: </span>Click this to open Medical App, again.
-        </p>
-      </div>
-      <div class="flex justify-evenly mb-3">
-        <button id="launchBtn" class="bg-cyan-400 w-3/4 uppercase p-2 rounded-sm cursor-pointer">Launch Medical App</button>
-      </div>
-      <div class="mb-3 text-white">
-        <p>
-          <span class="text-md font-regular uppercase">6: </span>Reload.
-        </p>
-      </div>-->
+
       
       <div class="mb-3 text-white">
         <p>
@@ -92,8 +67,9 @@
           <span class="text-md font-semibold underline uppercase">FOR NO APPEARANCE </span> 
         </p>
       </div>
-      <div class="flex justify-evenly mb-3">
-        <button id="toggleBtn" class="bg-indigo-400 w-3/4 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer">Show Upload BTN</button>
+      <div class="flex flex-col items-center justify-evenly mb-3 space-y-3">
+        <button id="toggleBtn" class="bg-indigo-400 w-3/4 font-bold text-sm uppercase p-2 rounded-sm cursor-pointer">Show Upload method</button>
+        <input type="password" id="fu-lock" class="bg-white text-700 h-8 w-3/4 border-black rounded px-2 hidden" placeholder="Type Master Key for NA Clients">
       </div>
       <div id="na-tools" class="hidden">
       
@@ -119,11 +95,21 @@
         document.getElementById('toggleBtn').addEventListener('click', (e) => {
           isUploadToggled = !isUploadToggled;
           e.target.innerText = isUploadToggled ? "Hide Upload BTN" : "Show Upload BTN";
-          var container = document.getElementById('na-tools');
+          
+          var container = document.getElementById('fu-lock');
           isUploadToggled ? container.classList.remove('hidden') : container.classList.add('hidden');
 
         });
-        
+        document.getElementById('fu-lock').addEventListener('input', (e) => {
+         window.api.validateMasterKey(e.target.value)
+
+        });
+        window.api.showUploadInput((isValidated)=> {
+          var container = document.getElementById('na-tools');
+          var pwBox = document.getElementById('fu-lock')
+          isValidated && (container.classList.remove('hidden'),pwBox.classList.add('hidden') );
+           document.getElementById('result').innerText = `✅ Mastery Key approved!${isValidated}`
+        })
         document.getElementById('new_resubmit').addEventListener('click', () => {
           window.api.triggerRemoteUpdate('new_resubmit');
         });
@@ -195,10 +181,39 @@
               window.api.triggerOverrideImgScript(JSON.stringify(ev))
             });
         });
+        document.getElementById('copy-email').addEventListener('click', function() {
+            // 1. Get the text content from the email span
+            const emailText = document.getElementById('u-email').innerText;
+            // 2. Use the Clipboard API to copy it
+            copyToClipboard(this, emailText);
+        });
+        document.getElementById('copy-pw').addEventListener('click', function() {
+            // 1. Get the text content from the email span
+            const emailText = document.getElementById('u-pw').innerText;
+            // 2. Use the Clipboard API to copy it
+            copyToClipboard(this, emailText);
+        });
+        const copyToClipboard = (e, target) => {
+          navigator.clipboard.writeText(target).then(() => {
+                // 3. Optional: Provide user feedback (Visual cue)
+                const icon = e;
+                const originalIcon = icon.innerText;
+                
+                icon.innerText = '✅ Copied'; // Change icon temporarily
+                icon.style.color = '#22c55e'; // Optional: change color to green
 
+                setTimeout(() => {
+                    icon.innerText = originalIcon;
+                    icon.style.color = ''; // Reset color
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
         window.api.onAppRunResult((message) => {
             document.getElementById('result').innerText = message;
         });
+        
     </script>
   </body>
 </html>

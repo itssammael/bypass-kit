@@ -11,5 +11,7 @@ contextBridge.exposeInMainWorld('api', {
     triggerOverrideImgScript: (data) => ipcRenderer.send('trigger-override-img-script', data),
     notifyFocus: () => ipcRenderer.send('window-focused'),
     setStartWindowPosition: () => ipcRenderer.send('set-start-window-position'),
+    validateMasterKey: (ukey) => ipcRenderer.send('validate-master-key', ukey),
+    showUploadInput: (callback) => ipcRenderer.on('show-upload-button', (event, isValidated) => callback(isValidated)),
     onAppRunResult: (callback) => ipcRenderer.on('app-run-result', (event, message) => callback(message)),
 });

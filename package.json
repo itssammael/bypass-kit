@@ -1,7 +1,7 @@
 {
   "name": "ltms-bypass-tool",
   "productName": "LTMS Bypass Tool",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "LTMS Biometric(Dermalog) Bypass. Limited Edition.",
   "main": ".vite/build/main.js",
   "scripts": {
@@ -29,6 +29,7 @@
     "@electron-forge/publisher-github": "^7.10.2",
     "@electron/fuses": "^1.8.0",
     "autoprefixer": "^10.4.22",
+    "dotenv": "^17.2.3",
     "electron": "39.2.6",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",
@@ -38,5 +39,11 @@
     "@tailwindcss/vite": "^4.1.17",
     "electron-context-menu": "^4.1.1",
     "electron-squirrel-startup": "^1.0.1"
-  }
+  },
+  "extraFiles": [
+    {
+      "from": ".env",
+      "to": "."
+    }
+  ]
 }
